@@ -26,6 +26,17 @@ class App extends Component {
   }
 
   /*
+   一个通用的setSource方法,方便调用
+   */
+  setSource(items, itemsDatasource, otherState = {}) {
+    this.setState({
+      items,
+      dataSource: this.state.dataSource.cloneWithRows(itemsDatasource),
+      ...otherState
+    })
+  }
+
+  /*
    传给Header.TextInput.onSubmitEditing的回调函数
    更新this.state.items
    设置this.state.value为空
@@ -43,11 +54,7 @@ class App extends Component {
       }
     ];
     // 更新state
-    this.setState({
-      items: newItems,
-      value: "",
-      dataSource: this.state.dataSource.cloneWithRows(newItems)
-    });
+    this.setSource(newItems, newItems, {value: ""})
   }
 
   /*
