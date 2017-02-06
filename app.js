@@ -1,11 +1,13 @@
 // 引入React和Component
-import React, { Component } from "react";
+import React, {Component} from "react";
 // 引入View，类似于html的Div
-import { View, Text, StyleSheet, Platform } from "react-native";
+import {View, Text, StyleSheet, Platform, ListView, Keyboard} from "react-native";
 // 引入我们的Header模块
 import Header from "./header";
 // 引入我们的Footer模块
 import Footer from "./footer";
+// 引入Row
+import Row from "./row";
 
 // 定义App类，这个类是Component的子类
 class App extends Component {
@@ -13,10 +15,13 @@ class App extends Component {
   // 构造方法,初始化state
   constructor(props) {
     super(props);
-    // 初始化2个状态
+    // 创建ListView.DataSource
+    const ds = new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2});
+    // 初始化状态
     this.state = {
       value: "",
-      items: []
+      items: [],
+      dataSource: ds.cloneWithRows([])
     };
   }
 
@@ -24,6 +29,7 @@ class App extends Component {
    传给Header.TextInput.onSubmitEditing的回调函数
    更新this.state.items
    设置this.state.value为空
+   更新this.state.dataSource
    */
   handleAddItem() {
     if (!this.state.value) return;
@@ -39,7 +45,8 @@ class App extends Component {
     // 更新state
     this.setState({
       items: newItems,
-      value: ""
+      value: "",
+      dataSource: this.state.dataSource.cloneWithRows(newItems)
     });
   }
 
@@ -51,13 +58,29 @@ class App extends Component {
     return (
       <View style={styles.container}>
         <Header
-          value = {this.state.value}
-          onAddItem = {this.handleAddItem.bind(this)}
-          onChange = {(value) => this.setState({value})}
+          value={this.state.value}
+          onAddItem={this.handleAddItem.bind(this)}
+          onChange={(value) => this.setState({value})}
         />
 
         <View style={styles.content}>
-          <Text>我是Content</Text>
+          <ListView
+            style={styles.list}
+            enableEmptySections
+            dataSource={this.state.dataSource}
+            onScroll={() => Keyboard.dismiss()}
+            renderRow={({key, ...value}) => {
+              return (
+                <Row
+                  key={key}
+                  {...value}
+                />
+              )
+            }}
+            renderSeparator={(sectionId, rowId) => {
+              return <View key={rowId} style={styles.separator}/>
+            }}
+          />
         </View>
 
         <Footer />
@@ -78,6 +101,13 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1
+  },
+  list: {
+    backgroundColor: '#FFF'
+  },
+  separator: {
+    borderWidth: 1,
+    borderColor: "#F5F5F5"
   }
 });
 
