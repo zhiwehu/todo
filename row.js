@@ -1,11 +1,15 @@
 import React, {Component} from "react";
 
-import {View, Text, StyleSheet} from "react-native";
+import {View, Text, StyleSheet, Switch} from "react-native";
 
 class Row extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Switch
+          value = {this.props.complete}
+          onValueChange = {this.props.onComplete}
+        />
         <View style={styles.textWrap}>
           <Text style={styles.text}>{this.props.text}</Text>
         </View>

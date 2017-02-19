@@ -23,6 +23,21 @@ class App extends Component {
       items: [],
       dataSource: ds.cloneWithRows([])
     };
+
+    this.setSource = this.setSource.bind(this);
+    this.handleToggleComplete = this.handleToggleComplete.bind(this);
+  }
+
+  handleToggleComplete(key, complete) {
+    const newItems = this.state.items.map((item) => {
+      if (item.key !== key) return item;
+      return {
+        ...item,
+        complete
+      }
+    });
+
+    this.setSource(newItems, newItems);
   }
 
   /*
@@ -54,7 +69,7 @@ class App extends Component {
       }
     ];
     // 更新state
-    this.setSource(newItems, newItems, {value: ""})
+    this.setSource(newItems, newItems, {value: ""});
   }
 
   /*
@@ -80,6 +95,7 @@ class App extends Component {
               return (
                 <Row
                   key={key}
+                  onComplete = {(complete) => this.handleToggleComplete(key, complete)}
                   {...value}
                 />
               )
