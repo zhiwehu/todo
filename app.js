@@ -9,6 +9,14 @@ import Footer from "./footer";
 // 引入Row
 import Row from "./row";
 
+const filterItems = (filter, todos) => {
+  return todos.filter(todo => {
+    if (filter === 'ALL') return true;
+    if (filter === 'ACTIVE') return !todo.complete;
+    if (filter === 'COMPLETE') return todo.complete;
+  });
+};
+
 // 定义App类，这个类是Component的子类
 class App extends Component {
 
@@ -19,6 +27,7 @@ class App extends Component {
     const ds = new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2});
     // 初始化状态
     this.state = {
+      filter: "ALL",
       value: "",
       items: [],
       dataSource: ds.cloneWithRows([])
@@ -28,13 +37,18 @@ class App extends Component {
     this.handleAddItem = this.handleAddItem.bind(this);
     this.handleToggleComplete = this.handleToggleComplete.bind(this);
     this.handleRemoveItem = this.handleRemoveItem.bind(this);
+    this.handleFilter = this.handleFilter.bind(this);
+  }
+
+  handleFilter(filter) {
+    this.setSource(this.state.items, filterItems(filter, this.state.items), {filter: filter})
   }
 
   handleRemoveItem(key) {
     const newItems = this.state.items.filter((item) => {
       return (item.key !== key);
     });
-    this.setSource(newItems, newItems);
+    this.setSource(newItems, filterItems(this.state.filter, newItems));
   }
 
   handleToggleComplete(key, complete) {
@@ -46,7 +60,7 @@ class App extends Component {
       }
     });
 
-    this.setSource(newItems, newItems);
+    this.setSource(newItems, filterItems(this.state.filter, newItems));
   }
 
   /*
@@ -78,7 +92,7 @@ class App extends Component {
       }
     ];
     // 更新state
-    this.setSource(newItems, newItems, {value: ""});
+    this.setSource(newItems, filterItems(this.state.filter, newItems), {value: ""});
   }
 
   /*
@@ -116,7 +130,10 @@ class App extends Component {
           />
         </View>
 
-        <Footer />
+        <Footer
+          filter = {this.state.filter}
+          onFilter = {this.handleFilter}
+        />
       </View>
     );
   }
