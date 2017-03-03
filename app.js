@@ -1,7 +1,7 @@
 // 引入React和Component
 import React, {Component} from "react";
 // 引入View，类似于html的Div
-import {View, Text, StyleSheet, Platform, ListView, Keyboard} from "react-native";
+import {View, Text, StyleSheet, Platform, ListView, Keyboard, AsyncStorage} from "react-native";
 // 引入我们的Header模块
 import Header from "./header";
 // 引入我们的Footer模块
@@ -40,6 +40,17 @@ class App extends Component {
     this.handleFilter = this.handleFilter.bind(this);
   }
 
+  componentWillMount() {
+    AsyncStorage.getItem("items").then(json => {
+      try {
+        const items = JSON.parse(json);
+        this.setSource(items, items);
+      } catch (e) {
+
+      }
+    });
+  }
+
   handleFilter(filter) {
     this.setSource(this.state.items, filterItems(filter, this.state.items), {filter: filter})
   }
@@ -71,7 +82,8 @@ class App extends Component {
       items,
       dataSource: this.state.dataSource.cloneWithRows(itemsDatasource),
       ...otherState
-    })
+    });
+    AsyncStorage.setItem("items", JSON.stringify(items));
   }
 
   /*
