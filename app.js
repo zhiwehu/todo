@@ -1,7 +1,7 @@
 // 引入React和Component
 import React, {Component} from "react";
 // 引入View，类似于html的Div
-import {View, Text, StyleSheet, Platform, ListView, Keyboard, AsyncStorage} from "react-native";
+import {View, Text, StyleSheet, Platform, ListView, Keyboard, AsyncStorage, ActivityIndicator} from "react-native";
 // 引入我们的Header模块
 import Header from "./header";
 // 引入我们的Footer模块
@@ -27,6 +27,7 @@ class App extends Component {
     const ds = new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2});
     // 初始化状态
     this.state = {
+      loading: true,
       filter: "ALL",
       value: "",
       items: [],
@@ -44,9 +45,9 @@ class App extends Component {
     AsyncStorage.getItem("items").then(json => {
       try {
         const items = JSON.parse(json);
-        this.setSource(items, items);
+        this.setSource(items, items, {loading: false});
       } catch (e) {
-
+        this.setState({loading: false});
       }
     });
   }
@@ -146,6 +147,13 @@ class App extends Component {
           filter = {this.state.filter}
           onFilter = {this.handleFilter}
         />
+
+        {this.state.loading && <View style={styles.loading}>
+          <ActivityIndicator
+            size="large"
+            animating
+          />
+        </View>}
       </View>
     );
   }
@@ -170,6 +178,16 @@ const styles = StyleSheet.create({
   separator: {
     borderWidth: 1,
     borderColor: "#F5F5F5"
+  },
+  loading: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.2)"
   }
 });
 
