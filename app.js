@@ -39,6 +39,8 @@ class App extends Component {
     this.handleToggleComplete = this.handleToggleComplete.bind(this);
     this.handleRemoveItem = this.handleRemoveItem.bind(this);
     this.handleFilter = this.handleFilter.bind(this);
+    this.handleUpdateText = this.handleUpdateText.bind(this);
+    this.handleToggleEditing = this.handleToggleEditing.bind(this);
   }
 
   componentWillMount() {
@@ -50,6 +52,28 @@ class App extends Component {
         this.setState({loading: false});
       }
     });
+  }
+
+  handleUpdateText(key, text) {
+    const newItems = this.state.items.map((item) =>{
+      if (item.key !== key) return item;
+      return {
+        ...item,
+        text
+      }
+    });
+    this.setSource(newItems, filterItems(this.state.filter, newItems));
+  }
+
+  handleToggleEditing(key, editing) {
+    const newItems = this.state.items.map((item) =>{
+      if (item.key !== key) return item;
+      return {
+        ...item,
+        editing
+      }
+    });
+    this.setSource(newItems, filterItems(this.state.filter, newItems));
   }
 
   handleFilter(filter) {
@@ -133,6 +157,8 @@ class App extends Component {
                   key={key}
                   onRemove = {() => this.handleRemoveItem(key)}
                   onComplete = {(complete) => this.handleToggleComplete(key, complete)}
+                  onToggleEdit = {(editing) => this.handleToggleEditing(key, editing)}
+                  onUpdate = {(text) => this.handleUpdateText(key, text)}
                   {...value}
                 />
               )
